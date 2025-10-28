@@ -1,0 +1,9 @@
+{
+  "name": "common",
+  "items": [
+    {"item": "com s", "chance": 0.4 },
+    {"item": "rare s", "chance": 0.3 },
+    {"item": "epic s", "chance": 0.2 },
+    {"item": "legen s", "chance": 0.1 }
+  ]
+}

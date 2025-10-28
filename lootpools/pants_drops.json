@@ -1,0 +1,9 @@
+{
+  "name": "common",
+  "items": [
+    {"item": "levi jeans", "chance": 0.4 },
+    {"item": "bershka jeans", "chance": 0.3 },
+    {"item": "acne studios jeans", "chance": 0.2 },
+    {"item": "balenciaga trackpants", "chance": 0.1 }
+  ]
+}
