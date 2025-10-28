@@ -53,8 +53,10 @@ def main():
         print("Invalid tier.")
         return
 
+
     prize = open_lootbox(selected_tier)
     print(f"\n you opened a loot box {selected_tier} and won {prize}")
+
 
 if __name__ == "__main__":
     main()
