@@ -24,7 +24,7 @@ lootboxes = {
     ],
 }
 
-def open_box(tier):
+def open_lootbox(tier):
     if tier not in lootboxes:
         print("Invalid tier.")
         return
@@ -35,13 +35,13 @@ def open_box(tier):
     for item in items:
         cumulative += item["chance"]
         if r<=cumulative:
-            return items["item"]
+            return item["item"]
 
 
 def main():
     print("Welcome to the Lootbox!")
     print("choose what lootbox you want to buy")
-    for i ,tier in enumerate(lootboxes(), 1):
+    for i, tier in enumerate(lootboxes.keys(), 1):
         print(f"{i}. {tier}")
 
     choice = input("enter number: ")
@@ -49,5 +49,13 @@ def main():
 
     try:
         selected_tier = tiers[int(choice)-1]
+    except (IndexError, ValueError):
+        print("Invalid tier.")
+        return
 
-        print(f"{i}: {lootboxes[i]}")
+    prize = open_lootbox(selected_tier)
+    print(f"\n you opened a loot box {selected_tier} and won {prize}")
+
+if __name__ == "__main__":
+    main()
+
