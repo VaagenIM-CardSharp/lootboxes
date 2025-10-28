@@ -1,112 +1,228 @@
-﻿import random, os, json
+﻿import os
+import json
+import random
 
 DATA_FOLDER = "data"
 PLAYERS_FOLDER = "players"
 
 
-def load_lootboxes():#loade lootboxer som ligger i en annen fil
+def load_lootboxes():
+    #tar data fra DATA_FOLDER
     lootboxes = {}
-    for filename in os.listdir(DATA_FOLDER):
-        if filename.endswith(".json"):
-            with open(os.path.join(DATA_FOLDER, filename), "r") as f:
-                data = json.load(f)
-                lootboxes[data["name"]] = data["items"]
-    return lootboxes
-lootboxes = load_lootboxes()
+    if not os.path.isdir(DATA_FOLDER):
 
-def create_player(player_name, starting_balance=1000): #lage en player account og gir han en currency "auto magisk " sondre eller sindre idk
-    # lage folder idk why. koffor ikke
+    for filename in os.listdir(DATA_FOLDER):
+        if not filename.endswith(".json"):
+            continue
+        path = os.path.join(DATA_FOLDER, filename)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            print(f"Warning: failed to read {path}")
+            continue
+
+        name = data.get("name")
+        if not name:
+            continue
+
+        # pass paa at det er int 
+        cost = data.get("cost", 0)
+        try:
+            cost = int(cost)
+        except Exception:
+            try:
+                cost = int(float(cost))
+            except Exception:
+                cost = 0
+
+        items = data.get("items", [])
+        lootboxes[name] = {"cost": cost, "items": items}
+
+    return lootboxes
+
+
+def ensure_players_folder():
     if not os.path.exists(PLAYERS_FOLDER):
         os.makedirs(PLAYERS_FOLDER)
-        print(f"Created folder: {PLAYERS_FOLDER}")
 
-    # path
-    player_file = os.path.join(PLAYERS_FOLDER, f"{player_name}.json")
 
-    # ingen frauds
-    if os.path.exists(player_file):
-        print(f"Player '{player_name}' already exists!")
-        return
+def player_file_path(player_name):
+    ensure_players_folder()
+    safe_name = f"{player_name}.json"
+    return os.path.join(PLAYERS_FOLDER, safe_name)
 
-    player_data = {"balance": starting_balance}
 
-    # jarvis"JSON" husk dette
-    with open(player_file, "w") as f:
+def create_player(player_name, starting_balance=1000):
+    path = player_file_path(player_name)
+    if os.path.exists(path):
+        print(f"Player '{player_name}' already exists.")
+        return False
+
+    player_data = {"name": player_name, "balance": starting_balance, "inventory": []}
+    with open(path, "w", encoding="utf-8") as f:#"bruk utf-8" chatGPT 
+        json.dump(player_data, f, indent=4)
+    print(f"Created player '{player_name}' with balance {starting_balance}")
+    return True
+
+
+def load_player(player_name):
+    path = player_file_path(player_name)
+    if not os.path.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_player(player_name, player_data):
+    path = player_file_path(player_name)
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(player_data, f, indent=4)
 
-    print(f"Created new player '{player_name}' with balance {starting_balance}")
 
-def open_lootbox(tier):
-    if tier not in lootboxes:
-        print("Invalid tier.")
+def list_players():
+    ensure_players_folder()
+    results = []
+    for filename in os.listdir(PLAYERS_FOLDER):
+        if filename.endswith(".json"):
+            results.append(filename[:-5])
+    return results
+
+
+def open_lootbox_choice(box_def):
+    """Given a box definition (dict with items key), return a picked item using chance weights."""
+    items = box_def.get("items", [])
+    r = random.random()
+    cumulative = 0.0
+    for it in items:
+        try:
+            chance = float(it.get("chance", 0))
+        except Exception:
+            chance = 0.0
+        cumulative += chance
+        if r <= cumulative:
+            return it.get("item")
+    # fallback
+    if items:
+        return items[-1].get("item")
+    return None
+
+
+def print_main_menu(current_player):
+    print("\n=== CardSharP Lootboxes ===")
+    if current_player:
+        print(f"Current player: {current_player}")
+    else:
+        print("No player selected")
+    print("Type 'w' for lootboxes")
+    print("Type 'p' for player options")
+    print("Type 'q' to quit")
+
+
+def profile_menu(state):
+    # state is a dict holding current_player and lootboxes
+    while True:
+        print("\n--- Player Menu ---")
+        print("1. List players")
+        print("2. Create player")
+        print("3. Select player")
+        print("4. Show current player")
+        print("b. Back")
+        choice = input("Choice: ")
+        if choice == "1":
+            players = list_players()
+            if not players:
+                print("No players found")
+            else:
+                for p in players:
+                    print(f"- {p}")
+        elif choice == "2":
+            name = input("Enter new player name: ")
+            if name:
+                create_player(name)
+        elif choice == "3":
+            name = input("Enter player name to select: ")
+            if load_player(name) is None:
+                print("Player not found")
+            else:
+                state["current_player"] = name
+                print(f"Selected player: {name}")
+        elif choice == "4":
+            cp = state.get("current_player")
+            if not cp:
+                print("No player selected")
+            else:
+                pdata = load_player(cp)
+                print(json.dumps(pdata, indent=2))
+        elif choice.lower() == "b":
+            return
+        else:
+            print("Invalid choice")
+
+
+def open_lootbox_menu(state):
+    current = state.get("current_player")
+    if not current:
+        print("No player selected. Go to player menu to select or create one.")
         return
 
-    items = lootboxes[tier]
-    r = random.random()
-    cumulative = 0
-    for item in items:
-        cumulative += item["chance"]
-        if r<=cumulative:
-            return item["item"]
+    pdata = load_player(current)
+    if pdata is None:
+        print("Failed to load player data")
+        return
+
+    print("\n=== LOOTBOX MENU ===")
+    boxes = list(state.get("lootboxes", {}).items())
+    if not boxes:
+        print("No lootboxes available.")
+        return
+
+    for i, (name, box) in enumerate(boxes, start=1):
+        print(f"{i}. {name} - Cost: {box.get('cost', 0)}")
+
+    print(f"Balance: {pdata.get('balance', 0)} coins")
+    choice = input("Enter number of lootbox to open (or 'b' to go back): ")
+    if choice.lower() == 'b':
+        return
+
+    try:
+        idx = int(choice) - 1
+        selected_name, selected_box = boxes[idx]
+    except Exception:
+        print("Invalid choice.")
+        return
+    #broke boi
+    cost = selected_box.get('cost', 0)
+    if pdata.get('balance', 0) < cost:
+        print("Not enough coins!")
+        return
+
+    # TAKE THEIR MONEY
+    pdata['balance'] = pdata.get('balance', 0) - cost
+    prize = open_lootbox_choice(selected_box)
+    if prize:
+        pdata.setdefault('inventory', []).append(prize)
+
+    save_player(current, pdata)
+    print(f"\n you opened a {selected_name} lootbox and won: {prize}")
 
 
 def main():
+    lootboxes = load_lootboxes()
+    state = {"current_player": None, "lootboxes": lootboxes}
+
     while True:
-        print("\nWelcome to CardsharP")
-        print("Type 'w' for lootboxes")
-        print("Type 'p' for player options")
-        print("Type 'q' to quit")
-
+        print_main_menu(state.get("current_player"))
         choice = input("enter your choice: ")
-
         if choice == "w":
-            open_lootbox_menu()
+            open_lootbox_menu(state)
         elif choice == "p":
-            profile_menu()
+            profile_menu(state)
         elif choice == "q":
             break
         else:
             print("Invalid choice.")
 
-        def open_lootbox_menu(current_player):
-            # 1️⃣ Load player data
-            player_data = load_player_data(current_player)  # your function to read JSON
-
-            # 2️⃣ Display available lootboxes
-            print("\n=== LOOTBOX MENU ===")
-            for i, tier in enumerate(lootboxes.keys(), 1):
-                print(f"{i}. {tier}")
-
-            print(f"Balance: {player_data['balance']} coins")
-
-            # 3️⃣ Ask the player to choose a lootbox
-            choice = input("Enter number of lootbox to open (or 'b' to go back): ")
-            if choice.lower() == 'b':
-                return  # go back to main menu
-
-            # 4️⃣ Convert choice to tier name safely
-            try:
-                selected_tier = list(lootboxes.keys())[int(choice) - 1]
-            except (IndexError, ValueError):
-                print("Invalid choice.")
-                return
-
-            # 5️⃣ Check if player has enough coins
-            cost = get_lootbox_cost(selected_tier)  # define cost per tier
-            if player_data['balance'] < cost:
-                print("Not enough coins!")
-                return
-
-            # 6️⃣ Deduct cost and open lootbox
-            player_data['balance'] -= cost
-            prize = open_lootbox(selected_tier, lootboxes)  # your existing function
-
-            # 7️⃣ Save updated balance
-            save_player_data(current_player, player_data)  # your function to write JSON
-
-            print(f"\n🎉 You opened a {selected_tier} lootbox and won: {prize}")
-
 
 if __name__ == "__main__":
     main()
-
