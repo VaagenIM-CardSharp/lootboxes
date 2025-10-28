@@ -10,6 +10,7 @@ def load_lootboxes():
     #tar data fra DATA_FOLDER
     lootboxes = {}
     if not os.path.isdir(DATA_FOLDER):
+        return lootboxes
 
     for filename in os.listdir(DATA_FOLDER):
         if not filename.endswith(".json"):
