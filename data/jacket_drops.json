@@ -1,5 +1,6 @@
 {
   "name": "jackets",
+  "cost": "250",
   "items": [
     {"item": "com j", "chance": 0.4 },
     {"item": "rare j", "chance": 0.3 },

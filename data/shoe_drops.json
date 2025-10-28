@@ -1,5 +1,6 @@
 {
   "name": "shoes",
+  "cost": "250",
   "items": [
     {"item": "com s", "chance": 0.4 },
     {"item": "rare s", "chance": 0.3 },
