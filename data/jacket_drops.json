@@ -1,9 +1,9 @@
 {
-  "name": "common",
+  "name": "jackets",
   "items": [
     {"item": "com j", "chance": 0.4 },
     {"item": "rare j", "chance": 0.3 },
     {"item": "epic j", "chance": 0.2 },
     {"item": "legen j", "chance": 0.1 }
   ]
-} 
+}

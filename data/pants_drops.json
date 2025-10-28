@@ -1,5 +1,5 @@
 {
-  "name": "common",
+  "name": "pants",
   "items": [
     {"item": "levi jeans", "chance": 0.4 },
     {"item": "bershka jeans", "chance": 0.3 },

@@ -1,5 +1,18 @@
 ﻿import random, os, json
-from loot_data import lootboxes
+DATA_FOLDER = "data"
+
+
+def load_lootboxes():
+    lootboxes = {}
+    for filename in os.listdir(DATA_FOLDER):
+        if filename.endswith(".json"):
+            with open(os.path.join(DATA_FOLDER, filename), "r") as f:
+                data = json.load(f)
+                lootboxes[data["name"]] = data["items"]
+    return lootboxes
+lootboxes = load_lootboxes()
+
+
 
 def open_lootbox(tier):
     if tier not in lootboxes:
