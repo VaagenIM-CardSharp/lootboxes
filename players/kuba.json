@@ -1,8 +1,9 @@
 {
     "name": "kuba",
-    "balance": 500,
+    "balance": 250,
     "inventory": [
         "acne studios jeans",
-        "com j"
+        "com j",
+        "epic s"
     ]
 }
