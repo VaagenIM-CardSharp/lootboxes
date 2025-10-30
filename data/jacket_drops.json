@@ -2,9 +2,9 @@
   "name": "jackets",
   "cost": "250",
   "items": [
-    {"item": "com j", "chance": 0.4 },
-    {"item": "rare j", "chance": 0.3 },
-    {"item": "epic j", "chance": 0.2 },
-    {"item": "legen j", "chance": 0.1 }
+    {"item": "nike bubble jacket", "chance": 0.4 },
+    {"item": "carhart workjacket", "chance": 0.3 },
+    {"item": "saint laurent HEDI Slimane studed leather jacket", "chance": 0.2 },
+    {"item": "Maison Margiela x H&M belted leather jacket", "chance": 0.1 }
   ]
 }
