@@ -1,6 +1,7 @@
 {
     "name": "kuba",
     "balance": 0,
+    "SPENT": 0,
     "inventory": [
         "acne studios jeans",
         "com j",

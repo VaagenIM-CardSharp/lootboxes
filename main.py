@@ -60,7 +60,7 @@ def create_player(player_name, starting_balance=1000):
         print(f"Player '{player_name}' already exists.")
         return False
 
-    player_data = {"name": player_name, "balance": starting_balance, "inventory": []}
+    player_data = {"name": player_name, "balance": starting_balance,"SPENT": 0, "inventory": []}
     with open(path, "w", encoding="utf-8") as f:#"bruk utf-8" chatGPT 
         json.dump(player_data, f, indent=4)
     print(f"Created player '{player_name}' with balance {starting_balance}")
@@ -82,11 +82,35 @@ def save_player(player_name, player_data):
 
 
 def list_players():
+
     ensure_players_folder()
-    results = []
+    players = []
+
     for filename in os.listdir(PLAYERS_FOLDER):
-        if filename.endswith(".json"):
-            results.append(filename[:-5])
+        if not filename.endswith(".json"):
+            continue
+        file_path = os.path.join(PLAYERS_FOLDER, filename)
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, FileNotFoundError): 
+            continue
+
+        name = filename[:-5]
+        spent = data.get("SPENT", 0)
+        try:
+            spent = float(spent)
+        except Exception:
+            spent = 0
+
+        players.append({"name": name, "spent": spent})
+
+    players.sort(key=lambda x: x["spent"], reverse=True)
+
+    results = []
+    for i, p in enumerate(players, start=1):
+        results.append(f"{i}. {p['name']} - Total Spent: {int(p['spent'])} coins")
+
     return results
 
 
@@ -200,6 +224,7 @@ def open_lootbox_menu(state):
 
     # TAKE THEIR MONEY
     pdata['balance'] = pdata.get('balance', 0) - cost
+    pdata['SPENT'] = pdata.get('SPENT', 0) + cost
     prize = open_lootbox_choice(selected_box)
     if prize:
         pdata.setdefault('inventory', []).append(prize)
