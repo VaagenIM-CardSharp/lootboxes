@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Lootboxes</h1>
+  <ul>
+  {% for name, box in boxes.items() %}
+    <li>
+      <strong>{{ name }}</strong> — Cost: {{ box['cost'] }}
+      <a href="{{ url_for('open_box', box_name=name) }}">Open</a>
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}

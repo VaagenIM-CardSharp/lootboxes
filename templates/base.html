@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lootboxes</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 1rem; }
+    nav a { margin-right: 1rem }
+    .card { border: 1px solid #ddd; padding: .5rem; margin: .5rem 0 }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="{{ url_for('index') }}">Home</a>
+  <a href="{{ url_for('players') }}">Players</a>
+  <a href="{{ url_for('lootboxes') }}">Lootboxes</a>
+</nav>
+<hr>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+    {% for m in messages %}
+      <li>{{ m }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+</body>
+</html>

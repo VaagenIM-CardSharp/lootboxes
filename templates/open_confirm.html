@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Open {{ box_name }}</h1>
+  <p>Cost: {{ cost }} coins</p>
+  <form method="post">
+    <button type="submit">Open now</button>
+    <a href="{{ url_for('lootboxes') }}">Cancel</a>
+  </form>
+{% endblock %}

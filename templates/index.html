@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Lootboxes</h1>
+  {% if player %}
+    <p>Current player: <strong>{{ player }}</strong> — Balance: <strong>{{ balance }}</strong> coins</p>
+    <form method="post" action="{{ url_for('logout') }}"><button type="submit">Logout</button></form>
+  {% else %}
+    <p>No player selected. Go to the <a href="{{ url_for('players') }}">Players</a> page to create or select one.</p>
+  {% endif %}
+
+  <h2>Available boxes</h2>
+  {% if lootboxes %}
+    <ul>
+    {% for name, box in lootboxes.items() %}
+      <li>{{ name }} — Cost: {{ box.cost if box.cost is not none else box['cost'] }} <a href="{{ url_for('open_box', box_name=name) }}">Open</a></li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>No lootboxes available.</p>
+  {% endif %}
+{% endblock %}

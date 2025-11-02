@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Players / Scoreboard</h1>
+
+  <h2>Create player</h2>
+  <form method="post" action="{{ url_for('create_player') }}">
+    <input name="name" placeholder="player name">
+    <button type="submit">Create</button>
+  </form>
+
+  <h2>Scoreboard</h2>
+  {% if scoreboard %}
+    <ul>
+    {% for line in scoreboard %}
+      <li>{{ line }}</li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>No players yet.</p>
+  {% endif %}
+
+  <h2>Select player</h2>
+  <form method="post" action="{{ url_for('select_player') }}">
+    <input name="name" placeholder="existing player name">
+    <button type="submit">Select</button>
+  </form>
+{% endblock %}
