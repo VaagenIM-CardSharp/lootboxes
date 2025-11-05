@@ -162,6 +162,10 @@ def profile_menu(state):
                 for p in players:
                     print(f"- {p}")
         elif choice == "2":
+
+
+
+
             name = input("Enter new player name: ")
             if name:
                 create_player(name)
